@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-app-svc
+  labels:
+    app: my-app
+spec:
+  selector:
+    app: my-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+      name: http

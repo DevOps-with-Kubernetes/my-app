@@ -1,0 +1,38 @@
+sudo: true
+dist: trusty
+env:
+  # $CI_ENV_REGISTRY_USER, $CI_ENV_REGISTRY_PASS should be set beforehand
+  global:
+  - DOCKER_REPO=devopswithkubernetes/my-app
+  - BUILD_IMAGE_PATH=${DOCKER_REPO}:b${TRAVIS_BUILD_NUMBER}
+  - RELEASE_IMAGE_PATH=${DOCKER_REPO}:${TRAVIS_TAG}
+  - RELEASE_TARGET_NAMESPACE=default
+
+script:
+# the only line for building the image
+- docker build -t my-app .
+
+# the following lines are to verify if the built image works as expected
+# Here the criteria of our app is whether it returns 200 code
+- docker run --rm --name app -dp 5000:5000 my-app
+- sleep 10
+- CODE=$(curl -IXGET -so /dev/null -w "%{http_code}" localhost:5000)
+- '[ ${CODE} -eq 200 ] && echo "Image is OK"'
+- docker stop app
+
+after_success:
+- docker login -u ${CI_ENV_REGISTRY_USER} -p "${CI_ENV_REGISTRY_PASS}"
+- docker tag my-app ${BUILD_IMAGE_PATH}
+- docker push ${BUILD_IMAGE_PATH}
+- |
+  if [[ ${TRAVIS_TAG} =~ ^rel.*$ ]]; then
+    docker tag my-app ${RELEASE_IMAGE_PATH}
+    docker push ${RELEASE_IMAGE_PATH}
+  fi
+
+deploy:
+  provider: script
+  script: deployment/deploy.sh
+  on:
+    tags: true
+    condition: "${TRAVIS_TAG} =~ ^rel.*$"

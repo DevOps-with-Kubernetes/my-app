@@ -1,0 +1,8 @@
+.git
+.gitignore
+.dockerignore
+.travis.yml
+LICENSE
+VERSION
+README.md
+deployment/
