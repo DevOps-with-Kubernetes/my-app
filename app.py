@@ -8,9 +8,22 @@ from http.server import (
 )
 
 
+def fib(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+
 class MyMsgHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
-        message = "OK"
+        try:
+            message = str(fib(int(self.path.split('/')[1])))
+        except ValueError as ex:
+            message = "OK"
+        self.path
+        print(self.path)
         self.send_response(200)
         self.end_headers()
         self.wfile.write(message.encode())
