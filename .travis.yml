@@ -3,7 +3,7 @@ dist: trusty
 env:
   # $CI_ENV_REGISTRY_USER, $CI_ENV_REGISTRY_PASS should be set beforehand
   global:
-  - DOCKER_REPO=devopswithkubernetes/my-app
+  - DOCKER_REPO=ripon/k8s-app
   - BUILD_IMAGE_PATH=${DOCKER_REPO}:b${TRAVIS_BUILD_NUMBER}
   - RELEASE_IMAGE_PATH=${DOCKER_REPO}:${TRAVIS_TAG}
   - RELEASE_TARGET_NAMESPACE=default
